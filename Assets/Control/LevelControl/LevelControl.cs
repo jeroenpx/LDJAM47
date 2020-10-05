@@ -80,7 +80,7 @@ public class LevelControl : MonoBehaviour {
         if(amountButtonsPressed == amountButtons && !won) {
             won = true;
             Debug.Log("Win condition triggered!");
-            SendMessage("WeWon", SendMessageOptions.DontRequireReceiver);
+            SendMessage("OnMessageWeWon", SendMessageOptions.DontRequireReceiver);
         }
     }
 }

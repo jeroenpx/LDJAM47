@@ -5,7 +5,25 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ImportFromFile.unity
     guid: 61fd1bef7fc185440857ed420360700c
+  - enabled: 1
+    path: Assets/Scenes/Level_IntroDragAndDrop.unity
+    guid: ac46c8190a3f2144ca73caaae56079d9
+  - enabled: 1
+    path: Assets/Scenes/Level_IntroCollisions.unity
+    guid: 03e5cfdc021bbb54cb06988769420f4a
+  - enabled: 1
+    path: Assets/Scenes/Level_Bridge.unity
+    guid: 045cefac656ba8c449b3a516b4f2ad4e
+  - enabled: 1
+    path: Assets/Scenes/Level_GoingAround.unity
+    guid: d6b684859e7ea9f48b42cec4a1d9bdf6
+  - enabled: 1
+    path: Assets/Scenes/Level_UnlikelyCandidate.unity
+    guid: 07ca7dbbf3e1b4a44bb20c499f0bb646
+  - enabled: 1
+    path: Assets/Scenes/Level_MoveOutTimings2Buttons.unity
+    guid: db9a79cb2fefa274c83d14767ea5cf5e
   m_configObjects: {}

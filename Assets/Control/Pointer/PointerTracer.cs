@@ -36,6 +36,12 @@ public class PointerTracer : MonoBehaviour {
     public Color indicatorColorBasic;
     public Color indicatorColorPicked;
 
+    private bool fastForward = false;
+
+    public float fastSpeed = 4f;
+
+    public bool disabledTransition = false;
+
     private void Start() {
         control = GetComponent<LevelControl>();
         lvl = GetComponent<LevelReader>().GetLevel();
@@ -51,6 +57,27 @@ public class PointerTracer : MonoBehaviour {
 
         Shader.SetGlobalFloat("_GLOBAL_UnscaledTimeRestart", Time.unscaledTime-20000);
         Shader.SetGlobalFloat("_GLOBAL_UnscaledTimeFreeze", Time.unscaledTime-40000);
+
+        Time.timeScale = 1f;
+        ToggleFastForward(true, 2f);
+        LeanTween.delayedCall(8f, () => {
+            ToggleFastForward(false, 1f);
+        });
+    }
+
+    public void ToggleFastForward(bool enable, float factor) {
+        if(!dragging) {
+            fastForward = enable;
+            if(enable) {
+                Time.timeScale = factor * fastSpeed;
+            } else {
+                Time.timeScale = 1f;
+            }
+        }
+    }
+
+    public void DisableControls(bool disable) {
+        disabledTransition = disable;
     }
 
     private void UpdateDropPositions() {
@@ -82,6 +109,24 @@ public class PointerTracer : MonoBehaviour {
     }
     
     private void Update() {
+        if(disabledTransition) {
+            return;
+        }
+
+        if(Input.GetKeyDown(KeyCode.F)) {
+            ToggleFastForward(!fastForward, 1f);
+        }
+
+        if(fastForward) {
+            if(highlightedCube!=null) {
+                highlightedCube.Highlight(false);
+                highlightedCube = null;
+                DisableDropIndicators();
+            }
+            return;
+        }
+
+        // Stuff...
         Shader.SetGlobalFloat("_GLOBAL_UnscaledTime", Time.unscaledTime);
 
         Ray r = cam.ScreenPointToRay(Input.mousePosition);
@@ -137,6 +182,7 @@ public class PointerTracer : MonoBehaviour {
                 // Do something with highlightedCube
                 startPosition = highlightedCube.GridPosition;
                 newTarget = startPosition;
+                highlightedCube.OnClickStopMove();
 
                 Shader.SetGlobalVector("_GLOBAL_TimeStopCenter", new Vector3(startPosition.x + .5f, startPosition.z+.6f, -(startPosition.y +.5f)));
 

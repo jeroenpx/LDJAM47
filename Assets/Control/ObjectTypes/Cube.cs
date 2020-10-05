@@ -17,6 +17,8 @@ public class Cube : MonoBehaviour, IGridMoveableObject {
 
     public bool highlighted;
 
+    private LTDescr descr;
+
     [field: SerializeField]
     public Vector3Int GridPosition {get; set;}
     
@@ -36,7 +38,7 @@ public class Cube : MonoBehaviour, IGridMoveableObject {
 
             moveAnimator.SetTrigger("Move");
 
-            transform.LeanMove(goal, moveDuration).setIgnoreTimeScale(true);
+            descr = transform.LeanMove(goal, moveDuration).setIgnoreTimeScale(true);
             //transform.position = goal;
             /*LeanTween.delayedCall(0.5f, () => {
                 transform.position = goal;
@@ -50,6 +52,11 @@ public class Cube : MonoBehaviour, IGridMoveableObject {
         if(index >= directions.Count) {
             index-=directions.Count;
         }
+    }
+
+    public void OnClickStopMove() {
+        Debug.Log("Cancelled");
+        LeanTween.cancel(descr.id);
     }
 
     public void Highlight(bool highlight) {
