@@ -14,11 +14,17 @@ public class LevelControl : MonoBehaviour {
 
     private bool won = false;
 
+    public AudioSource source;
+    public AudioClip win;
+
     private void Start() {
         // Get the level
         lvl = GetComponent<LevelReader>().GetLevel();
         List<GameObject> moveablego = lvl.moveables;
         moveables = new List<MovingObject>();
+
+        source = GetComponent<AudioSource>();
+
         foreach(GameObject obj in moveablego) {
             moveables.Add(new MovingObject(obj.GetComponent<IGridMoveableObject>()));
         }
@@ -169,6 +175,8 @@ public class LevelControl : MonoBehaviour {
             won = true;
             Debug.Log("Win condition triggered!");
             SendMessage("OnMessageWeWon", SendMessageOptions.DontRequireReceiver);
+
+            source.PlayOneShot(win);
         }
     }
 }

@@ -45,10 +45,14 @@ public class PointerTracer : MonoBehaviour {
     public AudioSource source;
 
     public AudioClip hover;
+
+    public float hoverVol;
+
     public AudioClip timeStop;
     public AudioClip timeStart;
     public AudioClip tileHover;
     public AudioClip tileSelect;
+ 
 
     private bool hoverPlayed = false;
     private bool tileHoverPlayed = false;
@@ -59,7 +63,8 @@ public class PointerTracer : MonoBehaviour {
         lvl = GetComponent<LevelReader>().GetLevel();
 
         source = GetComponent<AudioSource>();
-      
+
+       
 
         dropIndicators = new List<GameObject>();
         dropMaterials = new List<Material>();
@@ -155,7 +160,7 @@ public class PointerTracer : MonoBehaviour {
 
                     if (hoverPlayed == false)
                     {
-                        source.PlayOneShot(hover);
+                        source.PlayOneShot(hover, hoverVol);
                         hoverPlayed = true;
                     }
                
@@ -239,7 +244,12 @@ public class PointerTracer : MonoBehaviour {
                 if(bestPosition != newTarget) {
                     Vector3Int oldTarget = newTarget;
                     newTarget = bestPosition;
-                    if(highlightedCube.GridPosition != newTarget && highlightedCube.GridPosition == oldTarget) {
+                            
+                  
+                    source.PlayOneShot(tileHover, hoverVol);
+               
+
+                    if (highlightedCube.GridPosition != newTarget && highlightedCube.GridPosition == oldTarget) {
                         GetComponent<LevelInfoMgr>().IncrementMoves();
                     } else if(highlightedCube.GridPosition == newTarget) {
                         GetComponent<LevelInfoMgr>().DecrementMoves();
@@ -287,4 +297,6 @@ public class PointerTracer : MonoBehaviour {
             }
         }
     }
+
+
 }
