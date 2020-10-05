@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class LevelControl : MonoBehaviour {
     
     private LevelRepresentation lvl;
-    private List<IGridMoveableObject> moveables;
+    private List<MovingObject> moveables;
 
     public float timeStep = 0.5f;
 
@@ -18,9 +18,9 @@ public class LevelControl : MonoBehaviour {
         // Get the level
         lvl = GetComponent<LevelReader>().GetLevel();
         List<GameObject> moveablego = lvl.moveables;
-        moveables = new List<IGridMoveableObject>();
+        moveables = new List<MovingObject>();
         foreach(GameObject obj in moveablego) {
-            moveables.Add(obj.GetComponent<IGridMoveableObject>());
+            moveables.Add(new MovingObject(obj.GetComponent<IGridMoveableObject>()));
         }
 
         StartCoroutine(GameLoop());
@@ -34,24 +34,111 @@ public class LevelControl : MonoBehaviour {
         }
     }
 
-    private void Tick() {
-        // Ok, let's do an update
-        foreach(IGridMoveableObject moveable in moveables) {
-            Vector3Int startPos = moveable.GridPosition;
-            Direction moveTo = moveable.GetWantsToMoveDirection();
+    class MovingObject {
+        public IGridMoveableObject moveable;
 
-            // Update data
-            Vector3Int endPos = startPos + (Vector3Int)moveTo.Delta;
-            Direction canMove = Direction.NONE;
-            if(lvl.GetFloorHeightAt(endPos.x, endPos.y) == moveable.GridPosition.z) {
-                // Same level, OK!
-                canMove = moveTo;
+        public Vector3Int startPos;
+
+        public Direction moveTo;
+
+        public Vector3Int predictedEndPos;
+
+        public Direction pushedDirection;
+
+        public bool canMoveNoWall;
+
+        public Direction finalMoveTo;
+
+        public MovingObject(IGridMoveableObject moveable) {
+            this.moveable = moveable;
+        }
+    }
+
+    class Cell {
+        public List<IGridMoveableObject> goingTo;
+    }
+
+    private void Tick() {
+        // Init
+        SortedSet<int> levels = new SortedSet<int>();
+        foreach(MovingObject obj in moveables) {
+            IGridMoveableObject moveable = obj.moveable;
+            obj.startPos = moveable.GridPosition;
+            obj.moveTo = moveable.GetWantsToMoveDirection();
+            obj.pushedDirection = Direction.NONE;
+
+            obj.predictedEndPos = obj.startPos + (Vector3Int)obj.moveTo.Delta;
+
+            levels.Add(obj.predictedEndPos.z);
+        }
+
+        IntGrid gapFilled = new IntGrid();
+        gapFilled.DefaultValue = -1;
+
+        // Update lowest level first
+        foreach(int level in levels) {
+            foreach(MovingObject obj in moveables) {
+                // Things that can happen: 
+                //  - you run into a wall/gap => we can know 100% whether we can move now
+                bool hitWall = lvl.GetFloorHeightAt(obj.predictedEndPos.x, obj.predictedEndPos.y) > obj.predictedEndPos.z;
+                bool hitGap = lvl.GetFloorHeightAt(obj.predictedEndPos.x, obj.predictedEndPos.y) < obj.predictedEndPos.z;
+                obj.canMoveNoWall = !hitWall && (!hitGap || gapFilled[obj.predictedEndPos.x, obj.predictedEndPos.y] == obj.predictedEndPos.z);
+                
+                // Blocks that don't move move with the block underneath (ITERATION 1)
+                if(!obj.canMoveNoWall) {
+                    MovingObject below = null;
+                    foreach(MovingObject floorCheck in moveables) {
+                        if(new Vector2Int(floorCheck.startPos.x, floorCheck.startPos.y) == new Vector2Int(obj.startPos.x, obj.startPos.y) && floorCheck.startPos.z == obj.startPos.z-1) {
+                            below = floorCheck;
+                        }
+                    }
+                    if(below != null) {
+                        // Change direction... Correct it, we can move (as we don't have overhangs and the block below can move)
+                        obj.moveTo = below.finalMoveTo;
+                        obj.canMoveNoWall = true;
+                    }
+                }
             }
 
-            moveable.GridPosition = startPos + (Vector3Int)canMove.Delta;;
+            //  - you run into another block
+            foreach(MovingObject obj in moveables) {
+                // Find out which blocks run into each other?
+            }
+
+            
+
+            // Finally, move them in memory
+            foreach(MovingObject obj in moveables) {
+                Direction movingDir = Direction.NONE;
+                if(obj.canMoveNoWall) {
+                    movingDir = obj.moveTo;
+                }
+                obj.finalMoveTo = movingDir;
+                Vector3Int finalPosition = obj.startPos + (Vector3Int) movingDir.Delta;
+                gapFilled[finalPosition.x, finalPosition.y] = finalPosition.z+1;
+            }
+        }
+
+        // TODO: try to push things
+
+
+
+        foreach(MovingObject obj in moveables) {
+            // Check if we are moving to the start position of something.
+            // If so, we can only move if that object can move & if it doesn't move the opposite direction as us
+
+
+            // Check if we are moving towards 
+        }
+
+
+        // Finalize, actually move everything.
+        foreach(MovingObject obj in moveables) {
+            IGridMoveableObject moveable = obj.moveable;
+            moveable.GridPosition = obj.startPos + (Vector3Int) obj.finalMoveTo.Delta;
 
             // Animate
-            moveable.Animate(canMove, 0);
+            moveable.Animate(obj.finalMoveTo, 0);
 
             // End Frame
             moveable.OnEndFrame();
@@ -67,7 +154,8 @@ public class LevelControl : MonoBehaviour {
         foreach(GameObject btn in lvl.buttons) {
             Button b = btn.GetComponent<Button>();
             bool pressed = false;
-            foreach(IGridMoveableObject moveable in moveables) {
+            foreach(MovingObject obj in moveables) {
+                IGridMoveableObject moveable = obj.moveable;
                 if(b.GridPosition == moveable.GridPosition) {
                     pressed = true;
                 }

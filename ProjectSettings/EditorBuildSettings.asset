@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ImportFromFile.unity
     guid: 61fd1bef7fc185440857ed420360700c
   - enabled: 1
@@ -26,4 +26,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level_MoveOutTimings2Buttons.unity
     guid: db9a79cb2fefa274c83d14767ea5cf5e
+  - enabled: 1
+    path: Assets/Scenes/Level_2ButtonsSimplified.unity
+    guid: b3128c7de51f06347ae731fc7640f69a
+  - enabled: 1
+    path: Assets/Scenes/Level_BridgeSimplified.unity
+    guid: 1f6df34321990a7418dd01a7f8a6ca1c
   m_configObjects: {}

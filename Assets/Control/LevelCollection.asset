@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: LevelCollection
   m_EditorClassIdentifier: 
   sceneNames:
+  - ImportFromFile
   - Level_IntroDragAndDrop
   - Level_IntroCollisions
+  - Level_BridgeSimplified
   - Level_Bridge
   - Level_UnlikelyCandidate
   - Level_GoingAround
+  - Level_2ButtonsSimplified
   - Level_MoveOutTimings2Buttons
