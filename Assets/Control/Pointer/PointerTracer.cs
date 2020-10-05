@@ -42,9 +42,24 @@ public class PointerTracer : MonoBehaviour {
 
     public bool disabledTransition = false;
 
+    public AudioSource source;
+
+    public AudioClip hover;
+    public AudioClip timeStop;
+    public AudioClip timeStart;
+    public AudioClip tileHover;
+    public AudioClip tileSelect;
+
+    private bool hoverPlayed = false;
+    private bool tileHoverPlayed = false;
+    private bool tileSelectPlayed = false;
+
     private void Start() {
         control = GetComponent<LevelControl>();
         lvl = GetComponent<LevelReader>().GetLevel();
+
+        source = GetComponent<AudioSource>();
+      
 
         dropIndicators = new List<GameObject>();
         dropMaterials = new List<Material>();
@@ -137,6 +152,13 @@ public class PointerTracer : MonoBehaviour {
             if(Physics.Raycast(r, out hitInfo, 1000f, 1 << LayerMask.NameToLayer(layerMask))) {
                 Cube c = hitInfo.collider.gameObject.GetComponent<Cube>();
                 if(c!=null) {
+
+                    if (hoverPlayed == false)
+                    {
+                        source.PlayOneShot(hover);
+                        hoverPlayed = true;
+                    }
+               
                     // We are pointing at this cube. Highlight it!
                     if(highlightedCube == c) {
                         // Already the case
@@ -167,6 +189,8 @@ public class PointerTracer : MonoBehaviour {
                     highlightedCube.Highlight(false);
                     highlightedCube = null;
                     DisableDropIndicators();
+
+                    hoverPlayed = false;
                 }
             }
 
@@ -177,14 +201,18 @@ public class PointerTracer : MonoBehaviour {
                 Shader.SetGlobalFloat("_GLOBAL_UnscaledTimeFreeze", Time.unscaledTime);
                 Shader.SetGlobalFloat("_GLOBAL_UnscaledTimeRestart", Time.unscaledTime+360000);
                 Shader.SetGlobalFloat("GLOBAL_IndicatorAlpha", highlighAlpha);
-                
+
+                source.PlayOneShot(timeStop);
 
                 // Do something with highlightedCube
                 startPosition = highlightedCube.GridPosition;
                 newTarget = startPosition;
                 highlightedCube.OnClickStopMove();
 
+                
                 Shader.SetGlobalVector("_GLOBAL_TimeStopCenter", new Vector3(startPosition.x + .5f, startPosition.z+.6f, -(startPosition.y +.5f)));
+
+               
 
                 UpdateDropDisplay();
                 
@@ -204,6 +232,8 @@ public class PointerTracer : MonoBehaviour {
                     if(dist<totalDist) {
                         bestPosition = pos;
                         totalDist = dist;
+
+                      
                     }
                 }
                 if(bestPosition != newTarget) {
@@ -225,13 +255,27 @@ public class PointerTracer : MonoBehaviour {
             velocity += new Vector3(mouseMoveFactor * Input.GetAxis("Mouse X"), 0, mouseMoveFactor * Input.GetAxis("Mouse Y"));
             //LeanTween.(highlightedCube, )
 
-            if(Input.GetKeyUp(KeyCode.Mouse0)) {
+
+
+          
+
+            if (Input.GetKeyUp(KeyCode.Mouse0)) {
                 // Released mouse button
                 // RESTART THE WORLD
                 dragging = false;
                 Time.timeScale = 1;
                 Shader.SetGlobalFloat("_GLOBAL_UnscaledTimeRestart", Time.unscaledTime);
                 //Shader.SetGlobalFloat("_GLOBAL_UnscaledTimeFreeze", Time.unscaledTime+360000);
+
+                source.PlayOneShot(timeStart);
+
+                if (tileSelectPlayed == false)
+                {
+                    source.PlayOneShot(tileSelect);
+                    tileSelectPlayed = true;
+                }
+
+                tileSelectPlayed = false;
 
                 Shader.SetGlobalFloat("GLOBAL_IndicatorAlpha", basicAlpha);
                 highlightedCube.transform.position = targetCubePosition;
