@@ -37,6 +37,7 @@ public class Cube : MonoBehaviour, IGridMoveableObject {
             moveAnimator.SetTrigger("Move");
 
             transform.LeanMove(goal, moveDuration).setIgnoreTimeScale(true);
+            //transform.position = goal;
             /*LeanTween.delayedCall(0.5f, () => {
                 transform.position = goal;
                 moveAnimator.SetTrigger("Idle");

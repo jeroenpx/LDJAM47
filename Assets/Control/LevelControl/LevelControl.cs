@@ -12,6 +12,8 @@ public class LevelControl : MonoBehaviour {
 
     public int stepCounter = 1;
 
+    private bool won = false;
+
     private void Start() {
         // Get the level
         lvl = GetComponent<LevelReader>().GetLevel();
@@ -53,6 +55,32 @@ public class LevelControl : MonoBehaviour {
 
             // End Frame
             moveable.OnEndFrame();
+        }
+
+        CheckWinCondition();
+    }
+
+    public void CheckWinCondition() {
+        // Check which buttons are pressed? / Update them
+        int amountButtons = lvl.buttons.Count;
+        int amountButtonsPressed = 0;
+        foreach(GameObject btn in lvl.buttons) {
+            Button b = btn.GetComponent<Button>();
+            bool pressed = false;
+            foreach(IGridMoveableObject moveable in moveables) {
+                if(b.GridPosition == moveable.GridPosition) {
+                    pressed = true;
+                }
+            }
+            b.UpdatePressed(pressed);
+            if(pressed) {
+                amountButtonsPressed++;
+            }
+        }
+        if(amountButtonsPressed == amountButtons && !won) {
+            won = true;
+            Debug.Log("Win condition triggered!");
+            SendMessage("WeWon", SendMessageOptions.DontRequireReceiver);
         }
     }
 }

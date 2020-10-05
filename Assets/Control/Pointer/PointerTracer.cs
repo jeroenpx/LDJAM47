@@ -48,6 +48,9 @@ public class PointerTracer : MonoBehaviour {
             dropMaterials.Add(dropIndicators[i].GetComponentInChildren<Renderer>().material);
         }
         Shader.SetGlobalFloat("GLOBAL_IndicatorAlpha", basicAlpha);
+
+        Shader.SetGlobalFloat("_GLOBAL_UnscaledTimeRestart", Time.unscaledTime-20000);
+        Shader.SetGlobalFloat("_GLOBAL_UnscaledTimeFreeze", Time.unscaledTime-40000);
     }
 
     private void UpdateDropPositions() {
@@ -87,7 +90,6 @@ public class PointerTracer : MonoBehaviour {
             RaycastHit hitInfo;
             Debug.DrawRay(r.origin, r.direction*20f, Color.red, 0.1f);
             if(Physics.Raycast(r, out hitInfo, 1000f, 1 << LayerMask.NameToLayer(layerMask))) {
-                Debug.Log("Hit something...");
                 Cube c = hitInfo.collider.gameObject.GetComponent<Cube>();
                 if(c!=null) {
                     // We are pointing at this cube. Highlight it!
@@ -167,7 +169,6 @@ public class PointerTracer : MonoBehaviour {
             Vector3 targetCubePositionUp = targetCubePosition + new Vector3(0, upAmount, 0);
             highlightedCube.transform.position = LeanSmooth.spring(highlightedCube.transform.position, targetCubePositionUp, ref velocity, smoothTime, float.MaxValue, Time.unscaledDeltaTime, friction, accelRate);
             velocity += new Vector3(mouseMoveFactor * Input.GetAxis("Mouse X"), 0, mouseMoveFactor * Input.GetAxis("Mouse Y"));
-            Debug.Log(Input.GetAxis("Mouse X"));
             //LeanTween.(highlightedCube, )
 
             if(Input.GetKeyUp(KeyCode.Mouse0)) {
@@ -182,6 +183,7 @@ public class PointerTracer : MonoBehaviour {
                 highlightedCube.transform.position = targetCubePosition;
                 highlightedCube.GridPosition = newTarget;
                 UpdateDropDisplay();
+                control.CheckWinCondition();
             }
         }
     }

@@ -15,6 +15,8 @@ public class LevelRepresentation : System.Object
 
     public List<GameObject> moveables = null;
 
+    public List<GameObject> buttons = null;
+
     public int GetFloorHeightAt(int x, int y) {
         int pointHeight = height[x, y];
         if(pointHeight > 10) {

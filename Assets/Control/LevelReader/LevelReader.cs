@@ -107,6 +107,7 @@ public class LevelReader : MonoBehaviour
         lvl.height.DefaultValue = -2;
 
         lvl.moveables = new List<GameObject>();
+        lvl.buttons = new List<GameObject>();
 
         // Read tiles
         // Find Layers
@@ -170,7 +171,9 @@ public class LevelReader : MonoBehaviour
                     blockObj.GetComponent<IGridMoveableObject>().GridPosition = new Vector3Int(x, y, lvl.GetFloorHeightAt(x, y));
                 } else if (parsedTile.Value.x == 1 && parsedTile.Value.y == 2) {
                     // Target
-                    DoInstantiatePart(prefabTarget, GetFloorInstantiatePos(x, y), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
+                    GameObject target = DoInstantiatePart(prefabTarget, GetFloorInstantiatePos(x, y), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
+                    target.GetComponent<Button>().GridPosition = new Vector3Int(x, y, lvl.GetFloorHeightAt(x, y));
+                    lvl.buttons.Add(target);
                 } else if (parsedTile.Value.x == 0 && parsedTile.Value.y == 3) {
                     // Player
                     GameObject playerObj = DoInstantiatePart(prefabPlayer, GetFloorInstantiatePos(x, y), Quaternion.AngleAxis(90, Vector3.up));
