@@ -1,9 +1,19 @@
 fileFormatVersion: 2
-guid: 491c21b456753db4fb86f559cb506399
+guid: 0e64e46907c3aba429b28d30a9831baa
 ModelImporter:
   serializedVersion: 19301
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bricks3
+    second: {fileID: 2100000, guid: 26cea35b144c683468065240f3dd0885, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Crystal3
+    second: {fileID: 2100000, guid: 38302c4d77328fc41a8ae04285689907, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0

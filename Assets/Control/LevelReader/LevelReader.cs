@@ -9,18 +9,21 @@ public class LevelReader : MonoBehaviour
 {
     public string levelFileName = "Level_";
 
+    public bool readFromFileSystem = false;
+
     [SerializeField]
     private LevelRepresentation lvl = null;
 
-    public GameObject prefabGround;
+    public List<GameObject> prefabsGround;
     public GameObject prefabWall;
     public GameObject prefabPoint;
+    public GameObject prefabCorner;
     public GameObject prefabCliff;
     public GameObject prefabBlock;
     public GameObject prefabTarget;
     public GameObject prefabPlayer;
 
-
+    [NaughtyAttributes.Button("(Re-)import Level")]
     [ContextMenu("(Re-)import Level")]
     void Import()
     {
@@ -28,6 +31,9 @@ public class LevelReader : MonoBehaviour
     }
 
     public LevelRepresentation GetLevel() {
+        if(lvl == null || lvl.xsize == 0) {
+            Import();
+        }
         return lvl;
     }
 
@@ -52,9 +58,11 @@ public class LevelReader : MonoBehaviour
         #else
             GameObject inst = GameObject.Instantiate(prefab, position, rotation);
             inst.transform.parent = transform;
+            return inst;
         #endif
     }
 
+    [NaughtyAttributes.Button("Clean Up")]
     void DoClear() {
         #if UNITY_EDITOR
             List<Transform> transforms = new List<Transform>();
@@ -83,7 +91,12 @@ public class LevelReader : MonoBehaviour
         // Init random
         Rnd.InitState(1);
 
-        XDocument doc = XDocument.Load("Assets/Levels/Resources/" + levelFileName + ".tmx");
+        string path = "Assets/Levels/Resources/" + levelFileName + ".tmx";
+        if(readFromFileSystem) {
+            path = System.IO.Path.GetFullPath(".")+"/"+ levelFileName + ".tmx";
+        }
+
+        XDocument doc = XDocument.Load(path);
         lvl = new LevelRepresentation();
 
         // Get width & height
@@ -185,6 +198,7 @@ public class LevelReader : MonoBehaviour
                     // Nothingness
                 } else if(height<100) {
                     // Floor
+                    GameObject prefabGround = prefabsGround[Rnd.Range(0, prefabsGround.Count)];
                     GameObject inst = DoInstantiatePart(prefabGround, GetFloorInstantiatePos(x, y), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
 
                     // Walls around floor?
@@ -197,7 +211,7 @@ public class LevelReader : MonoBehaviour
                     for(int i=heightEast/2;i<height/2;i++) {
                         DoInstantiatePart(prefabCliff, new Vector3(x+1, i, -(y+.5f)), Quaternion.AngleAxis(180, Vector3.up));
                     }
-                    for(int i=heightEast/2;i<height/2;i++) {
+                    for(int i=heightWest/2;i<height/2;i++) {
                         DoInstantiatePart(prefabCliff, new Vector3(x, i, -(y+.5f)), Quaternion.AngleAxis(0, Vector3.up));
                     }
                 } else {
@@ -214,8 +228,15 @@ public class LevelReader : MonoBehaviour
                             GameObject inst = DoInstantiatePart(prefabWall, new Vector3(x+.5f, i, -(y+.5f)), Quaternion.AngleAxis(Rnd.Range(0,2)*180 + 90, Vector3.up));
                         }
                     } else {
-                        for(int i=-1;i<=height-100;i++) {
-                            GameObject inst = DoInstantiatePart(prefabPoint, new Vector3(x+.5f, i, -(y+.5f)), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
+                        if(amountWalls == 0) {
+                            for(int i=-1;i<=height-100;i++) {
+                                GameObject inst = DoInstantiatePart(prefabPoint, new Vector3(x+.5f, i, -(y+.5f)), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
+                            }
+                        } else {
+                            /*for(int i=-1;i<=height-100;i++) {
+                                GameObject inst = DoInstantiatePart(prefabCorner, new Vector3(x+.5f, i, -(y+.5f)), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
+                            }*/
+                            DoInstantiatePart(prefabCorner, new Vector3(x+.5f, -1, -(y+.5f)), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
                         }
                     }
                     // if((heightNorth<10 || heightEast<10) && )

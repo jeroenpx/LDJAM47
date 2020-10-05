@@ -16,6 +16,7 @@ public class IntGrid: System.Object
     [SerializeField]
     private IntGridXLayer internalGrid = new IntGridXLayer();
 
+    [field: SerializeField]
     public int DefaultValue {get; set;}
 
     public int this[int x, int y]

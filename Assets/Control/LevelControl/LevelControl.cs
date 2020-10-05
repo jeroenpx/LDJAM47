@@ -10,6 +10,8 @@ public class LevelControl : MonoBehaviour {
 
     public float timeStep = 0.5f;
 
+    public int stepCounter = 1;
+
     private void Start() {
         // Get the level
         lvl = GetComponent<LevelReader>().GetLevel();
@@ -26,6 +28,7 @@ public class LevelControl : MonoBehaviour {
         while(true) {
             yield return new WaitForSeconds(timeStep);
             Tick();
+            stepCounter++;
         }
     }
 
@@ -37,10 +40,16 @@ public class LevelControl : MonoBehaviour {
 
             // Update data
             Vector3Int endPos = startPos + (Vector3Int)moveTo.Delta;
-            moveable.GridPosition = endPos;
+            Direction canMove = Direction.NONE;
+            if(lvl.GetFloorHeightAt(endPos.x, endPos.y) == moveable.GridPosition.z) {
+                // Same level, OK!
+                canMove = moveTo;
+            }
+
+            moveable.GridPosition = startPos + (Vector3Int)canMove.Delta;;
 
             // Animate
-            moveable.Animate(moveTo, 0);
+            moveable.Animate(canMove, 0);
 
             // End Frame
             moveable.OnEndFrame();
