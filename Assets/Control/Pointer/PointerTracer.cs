@@ -206,7 +206,15 @@ public class PointerTracer : MonoBehaviour {
                         totalDist = dist;
                     }
                 }
-                newTarget = bestPosition;
+                if(bestPosition != newTarget) {
+                    Vector3Int oldTarget = newTarget;
+                    newTarget = bestPosition;
+                    if(highlightedCube.GridPosition != newTarget && highlightedCube.GridPosition == oldTarget) {
+                        GetComponent<LevelInfoMgr>().IncrementMoves();
+                    } else if(highlightedCube.GridPosition == newTarget) {
+                        GetComponent<LevelInfoMgr>().DecrementMoves();
+                    }
+                }
             }
             UpdateDropDisplay();
 
@@ -227,7 +235,9 @@ public class PointerTracer : MonoBehaviour {
 
                 Shader.SetGlobalFloat("GLOBAL_IndicatorAlpha", basicAlpha);
                 highlightedCube.transform.position = targetCubePosition;
-                highlightedCube.GridPosition = newTarget;
+                if(highlightedCube.GridPosition != newTarget) {
+                    highlightedCube.GridPosition = newTarget;
+                }
                 UpdateDropDisplay();
                 control.CheckWinCondition();
             }

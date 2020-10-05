@@ -17,7 +17,11 @@ public class LevelInfoMgr : MonoBehaviour {
 
     public bool intro = true;
 
-    private void Start() {
+    private int movesDone = 0;
+
+    public int minMoves = 0;
+
+    private void UpdateInstructions() {
         int myIndex = collection.GetZeroBasedCurrentLevelIndex();
         textLevel.text = "Level "+(myIndex+1)+" / "+collection.GetTotalLevels();
         string instructions = "R   restart level\n";
@@ -26,9 +30,17 @@ public class LevelInfoMgr : MonoBehaviour {
         } else {
             instructions+="S   skip level\n";
         }
-        instructions+="\nF   toggle fast forward";
+        instructions+="\nF   toggle fast forward\n\n";
+
+        instructions+="\n# moves\n";
+        instructions+="   perfect: "+minMoves+"\n";
+        instructions+="   you: "+movesDone+"\n";
 
         textInstructions.text = instructions;
+    }
+
+    private void Start() {
+        UpdateInstructions();
 
         intro = true;
         LeanTween.delayedCall(3f, () => {intro = false;}).setIgnoreTimeScale(true);
@@ -86,5 +98,15 @@ public class LevelInfoMgr : MonoBehaviour {
 
     public void SetFastForwardMode(bool fastForwardMode) {
         this.fastForwardMode = fastForwardMode;
+    }
+
+    public void IncrementMoves() {
+        this.movesDone ++;
+        UpdateInstructions();
+    }
+
+    public void DecrementMoves() {
+        this.movesDone --;
+        UpdateInstructions();
     }
 }
