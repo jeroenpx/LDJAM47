@@ -38,7 +38,11 @@ public class LevelReader : MonoBehaviour
     }
 
     Vector2Int? DecodeTile(XElement tile) {
-        int value = int.Parse(tile.Attribute("gid").Value) - 1;
+        XAttribute at = tile.Attribute("gid");
+        int value = -1;
+        if(at!=null) {
+            value = int.Parse(tile.Attribute("gid").Value) - 1;
+        }
         if(value==-1) {
             return null;
         } else {
@@ -236,10 +240,10 @@ public class LevelReader : MonoBehaviour
                                 GameObject inst = DoInstantiatePart(prefabPoint, new Vector3(x+.5f, i, -(y+.5f)), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
                             }
                         } else {
-                            /*for(int i=-1;i<=height-100;i++) {
+                            for(int i=-1;i<=height-100;i++) {
                                 GameObject inst = DoInstantiatePart(prefabCorner, new Vector3(x+.5f, i, -(y+.5f)), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
-                            }*/
-                            DoInstantiatePart(prefabCorner, new Vector3(x+.5f, -1, -(y+.5f)), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
+                            }
+                            //DoInstantiatePart(prefabCorner, new Vector3(x+.5f, -1, -(y+.5f)), Quaternion.AngleAxis(Rnd.Range(0,4)*90, Vector3.up));
                         }
                     }
                     // if((heightNorth<10 || heightEast<10) && )

@@ -8,6 +8,8 @@ public class LevelCollection : ScriptableObject {
     [NaughtyAttributes.ReorderableList]
     public List<string> sceneNames;
 
+    public string endGame;
+
     public int GetZeroBasedCurrentLevelIndex() {
         string currentSceneName = SceneManager.GetActiveScene().name;
         return sceneNames.IndexOf(currentSceneName);
@@ -19,7 +21,11 @@ public class LevelCollection : ScriptableObject {
 
     public void MoveToNextLevel() {
         int nextLevel = GetZeroBasedCurrentLevelIndex()+1;
-        SceneManager.LoadScene(sceneNames[nextLevel], LoadSceneMode.Single);
+        if(nextLevel < sceneNames.Count) {
+            SceneManager.LoadScene(sceneNames[nextLevel], LoadSceneMode.Single);
+        } else {
+            SceneManager.LoadScene(endGame, LoadSceneMode.Single);
+        }
     }
 
     public void MoveToPreviousLevel() {

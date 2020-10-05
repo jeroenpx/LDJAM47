@@ -56,8 +56,8 @@ public class Spreader : MonoBehaviour {
         for(int x = 0;x < lvl.xsize; x++) {
             for(int y = 0;y < lvl.ysize; y++) {
                 int height = lvl.height[x, y];
-                if(height>10) {
-                    // wall, ignore
+                if(false && height>10) {
+                    // wall, ignore - well... Not anymore!
                 } else if (height >= 0) {
                     // Ground tile
                     int amount = Random.Range(minAmountPerTile, maxAmountPerTile);
