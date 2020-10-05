@@ -19,9 +19,16 @@ public class Cube : MonoBehaviour, IGridMoveableObject {
 
     private LTDescr descr;
 
+    public AudioSource blockMove;
+
     [field: SerializeField]
     public Vector3Int GridPosition {get; set;}
-    
+
+    private void Start()
+    {
+        blockMove = GetComponent<AudioSource>();
+    }
+ 
     public Direction GetWantsToMoveDirection() {
         return Direction.AvailableDirections[directions[index]];
     }
@@ -30,6 +37,8 @@ public class Cube : MonoBehaviour, IGridMoveableObject {
         Direction wantedToMove = GetWantsToMoveDirection();
 
         Vector3 goal = new Vector3(GridPosition.x+.5f, transform.position.y, -(GridPosition.y+.5f));
+
+        blockMove.Play();
         
         if(wantedToMove.Index != -1) {
             // Play move animation
